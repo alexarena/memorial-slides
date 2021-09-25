@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Slides</title>
+    <style>
+        .slide{
+            height: 100vh;
+            width: 100vw;
+            object-fit: contain;
+            transition: opacity 3s ease-in-out;
+            position: absolute;
+        }
+
+        /* #slide-a{
+            background-color: pink;
+        }
+        #slide-b{
+            background-color: green;
+        } */
+
+        body{
+            position: relative;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+        }
+    </style>
+  </head>
+  <body>
+    <!-- your content here... -->
+    <img id="slide-a" src="" class="slide"></img>
+    <img id="slide-b" src="" class="slide"></img>
+  </body>
+  <script>
+
+    function b2Url(fileName){
+        return `https://f001.backblazeb2.com/file/memorial-slides/${fileName}`
+    }
+
+    function sleep(ms) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
+
+
+    const a = document.getElementById('slide-a')
+    const b = document.getElementById('slide-b')
+
+    a.style.opacity = 0
+
+    async function renderSlide(){
+        await sleep(2000)
+        console.log('rs',a.style.opacity,b.style.opacity)
+        const resp = await fetch('/next-slide')
+        const slideDetails = await resp.json()
+
+        if(a.style.opacity === '0'){
+            a.src = b2Url(slideDetails.current.photo)
+            a.style.opacity = 1
+            b.style.opacity = 0
+        }
+        else if(b.style.opacity === '0'){
+            b.src = b2Url(slideDetails.current.photo)
+            b.style.opacity = 1
+            a.style.opacity = 0
+        }
+
+       
+    }
+
+    a.addEventListener('transitionend',()=>{
+        console.log('te!')
+        renderSlide()
+    })
+
+    renderSlide()
+
+
+
+
+
+  </script>
+</html>
