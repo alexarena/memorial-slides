@@ -7,82 +7,111 @@
 
     <title>Slides</title>
     <style>
-        .slide{
-            height: 100vh;
-            width: 100vw;
-            object-fit: contain;
-            transition: opacity 3s ease-in-out;
-            position: absolute;
-        }
+      .slide {
+        height: 100vh;
+        width: 100vw;
+        object-fit: contain;
+        transition: opacity 2.5s ease-in-out;
+        position: absolute;
+        background-color: black;
+      }
 
-        /* #slide-a{
-            background-color: pink;
-        }
-        #slide-b{
-            background-color: green;
-        } */
-
-        body{
-            position: relative;
-            margin: 0;
-            padding: 0;
-            background-color: black;
-        }
+      body {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        background-color: black;
+      }
     </style>
   </head>
-  <body>
-    <!-- your content here... -->
-    <img id="slide-a" src="" class="slide"></img>
-    <img id="slide-b" src="" class="slide"></img>
-  </body>
+  <body></body>
   <script>
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen()
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen()
+        }
+      }
+    }
 
-    function b2Url(fileName){
-        return `https://f001.backblazeb2.com/file/memorial-slides/${fileName}`
+    document.body.onclick = toggleFullScreen
+
+    function b2Url(fileName) {
+      return `https://f001.backblazeb2.com/file/memorial-slides/${fileName}`
     }
 
     function sleep(ms) {
-        return new Promise((resolve) => {
-            setTimeout(resolve, ms);
-        });
+      return new Promise((resolve) => {
+        setTimeout(resolve, ms)
+      })
     }
 
+    // set the initial slide photo
+    // fetch('/next-slide')
+    //   .then((r) => r.json())
+    //   .then((json) => {
+    //     const img = document.createElement('img')
+    //     img.src = b2Url(json.current.photo)
+    //     img.className = 'slide'
 
-    const a = document.getElementById('slide-a')
-    const b = document.getElementById('slide-b')
+    //     document.body.append(img)
+    //   })
 
-    a.style.opacity = 0
-
-    async function renderSlide(){
-        await sleep(2000)
-        console.log('rs',a.style.opacity,b.style.opacity)
+    let i = 0
+    async function checkNext() {
+      try {
         const resp = await fetch('/next-slide')
         const slideDetails = await resp.json()
 
-        if(a.style.opacity === '0'){
-            a.src = b2Url(slideDetails.current.photo)
-            a.style.opacity = 1
-            b.style.opacity = 0
-        }
-        else if(b.style.opacity === '0'){
-            b.src = b2Url(slideDetails.current.photo)
-            b.style.opacity = 1
-            a.style.opacity = 0
-        }
+        const images = Array.from(document.querySelectorAll('.slide'))
+        console.log('images', images)
+        const urls = images.map((img) => img.src)
+        console.log('urls', urls)
 
-       
+        const newUrl = b2Url(slideDetails.current.photo)
+
+        if (!urls.includes(newUrl)) {
+          console.log('adding', newUrl)
+          const img = document.createElement('img')
+          img.src = newUrl
+          img.className = 'slide'
+          img.id = i++
+          document.body.prepend(img)
+          console.log('appended', img)
+        }
+      } catch (e) {
+        console.log('err', e)
+      } finally {
+        await sleep(2000)
+        checkNext()
+      }
     }
 
-    a.addEventListener('transitionend',()=>{
-        console.log('te!')
-        renderSlide()
-    })
+    checkNext()
 
-    renderSlide()
+    setInterval(() => {
+      const images = Array.from(document.querySelectorAll('.slide')).reverse()
 
+      for (const img of images) {
+        if (img.style.opacity === '0') {
+          console.log('removing', img)
+          img.remove()
+          continue
+        }
+        if (img.style.opacity !== '0') {
+          img.style.opacity = 0
+          break
+        }
+      }
+    }, 5000)
 
-
-
-
+    async function renderSlide() {
+      console.log('rs')
+      const resp = await fetch('/next-slide')
+      const slideDetails = await resp.json()
+      renderSlide()
+    }
   </script>
 </html>
