@@ -48,27 +48,14 @@
       })
     }
 
-    // set the initial slide photo
-    // fetch('/next-slide')
-    //   .then((r) => r.json())
-    //   .then((json) => {
-    //     const img = document.createElement('img')
-    //     img.src = b2Url(json.current.photo)
-    //     img.className = 'slide'
-
-    //     document.body.append(img)
-    //   })
-
-    let i = 0
     async function checkNext() {
       try {
         const resp = await fetch('/next-slide')
         const slideDetails = await resp.json()
 
-        const images = Array.from(document.querySelectorAll('.slide'))
-        console.log('images', images)
-        const urls = images.map((img) => img.src)
-        console.log('urls', urls)
+        const urls = Array.from(document.querySelectorAll('.slide')).map(
+          (img) => img.src
+        )
 
         const newUrl = b2Url(slideDetails.current.photo)
 
@@ -77,9 +64,7 @@
           const img = document.createElement('img')
           img.src = newUrl
           img.className = 'slide'
-          img.id = i++
           document.body.prepend(img)
-          console.log('appended', img)
         }
       } catch (e) {
         console.log('err', e)
@@ -106,12 +91,5 @@
         }
       }
     }, 5000)
-
-    async function renderSlide() {
-      console.log('rs')
-      const resp = await fetch('/next-slide')
-      const slideDetails = await resp.json()
-      renderSlide()
-    }
   </script>
 </html>
