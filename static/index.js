@@ -3,6 +3,9 @@ const totalCount = document.getElementById('total-count')
 const uploadedCount = document.getElementById('uploaded-count')
 const uploadProgress = document.getElementById('upload-progress')
 
+const sectionComplete = document.getElementById('section-complete')
+const sectionUpload = document.getElementById('section-upload')
+
 function readFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -49,4 +52,7 @@ async function onSelectFiles() {
 
     uploadedCount.innerText = i++
   }
+
+  sectionComplete.style.display = 'block'
+  sectionUpload.style.display = 'none'
 }
