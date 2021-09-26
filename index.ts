@@ -1,9 +1,9 @@
 import { Application, Router, send } from 'https://deno.land/x/oak/mod.ts'
 import { encode } from 'https://deno.land/std/encoding/base64.ts'
-// import { config } from 'https://deno.land/x/dotenv/mod.ts'
+import { config } from 'https://deno.land/x/dotenv/mod.ts'
 import slides, { B2File } from './slides.ts'
 
-// config({ export: true })
+config({ export: true })
 
 const BUCKET_NAME = '8fd3db0ca3e91cd07ec70f11'
 
@@ -100,4 +100,4 @@ app.use(async (context) => {
 })
 
 console.log('App running!')
-await app.listen({ port: 5000 })
+await app.listen({ port: 0 })
