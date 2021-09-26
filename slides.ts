@@ -2,12 +2,6 @@ export interface B2File {
   fileName: string
 }
 
-function secondsFromNow(n: number) {
-  const t = new Date()
-  t.setSeconds(t.getSeconds() + n)
-  return t
-}
-
 export default function slides(filesIn: B2File[]) {
   let files = filesIn
 
@@ -17,7 +11,6 @@ export default function slides(filesIn: B2File[]) {
 
   let state = {
     pos: 0,
-    playAt: new Date(),
     photo: files[0].fileName,
   }
 
@@ -28,7 +21,6 @@ export default function slides(filesIn: B2File[]) {
     }
     return {
       photo: files[nextPos].fileName,
-      playAt: secondsFromNow(5),
       pos: nextPos,
     }
   }
