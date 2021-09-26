@@ -1,21 +1,34 @@
 const uploader = document.getElementById('upload')
+const totalCount = document.getElementById('total-count')
+const uploadedCount = document.getElementById('uploaded-count')
+const uploadProgress = document.getElementById('upload-progress')
+
+function readFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = function () {
+      return resolve(reader.result)
+    }
+    reader.onerror = function () {
+      return reject(reader.error)
+    }
+    reader.readAsBinaryString(file)
+  })
+}
 
 uploader.addEventListener('change', onSelectFiles, false)
 async function onSelectFiles() {
   console.log('File select!')
-  console.log(uploader)
-  const files = uploader.files /* now you can work with the file list */
-  const file = files[0]
-  console.log('file', file)
-  console.log(files)
+  uploadProgress.style.display = 'block'
 
-  const reader = new FileReader()
-  reader.onload = async function () {
-    const hash = CryptoJS.SHA1(CryptoJS.enc.Latin1.parse(reader.result))
-    console.log(hash.toString())
+  totalCount.innerText = uploader.files.length
+
+  let i = 1
+  for (const file of uploader.files) {
+    const contents = await readFile(file)
+    const hash = CryptoJS.SHA1(CryptoJS.enc.Latin1.parse(contents))
 
     const uploadParams = await fetch('/upload-params').then((res) => res.json())
-    console.log('up', uploadParams)
 
     const res = await fetch(uploadParams.url, {
       method: 'POST',
@@ -30,10 +43,10 @@ async function onSelectFiles() {
     })
 
     const json = await res.json()
+    console.log('Upload result', json)
 
     await fetch('/refresh-photos')
 
-    console.log(json)
+    uploadedCount.innerText = i++
   }
-  reader.readAsBinaryString(file)
 }
